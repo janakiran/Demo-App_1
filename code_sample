@@ -1,0 +1,618 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://web-harvest.sourceforge.net/schema/1.0/config" scriptlang="groovy">
+
+<!--access datastore -->
+<var-def name="bot_task_properties">
+	<datastore name="Inward_EFT_Rejects_Config">
+		<template>select * from @this</template>
+	</datastore>
+</var-def>
+  
+<script><![CDATA[
+	def BOT_CONFIG = [:]
+	bot_task_properties.getWrappedObject().toList().each { property ->
+		BOT_CONFIG.put(property.get("names").toString(), property.get("informations").toString())
+	}
+	sys.defineVariable("BOT_CONFIG", BOT_CONFIG)
+]]></script>	
+ 
+
+<script><![CDATA[ 
+
+   		import java.util.Calendar;
+		import java.util.Formatter;
+		import java.text.SimpleDateFormat;
+		
+		
+		import java.nio.file.Files;
+		import java.nio.file.Path;
+		import java.nio.file.Paths;
+		
+		import java.time.Year;
+		
+		Calendar cal = Calendar.getInstance();
+
+		Formatter fmt4 = new Formatter();
+		fmt4 = new Formatter();
+		fmt4.format("%tm. %tB", cal,cal);
+      
+      
+      	def date = new Date()
+		def sdf = new SimpleDateFormat("dd.MM.yyyy")
+		log.info(sdf.format(date))	
+		
+		Year y = Year.now();  
+		
+		String Chrome_Download_path = (BOT_CONFIG.getWrappedObject().get("Download_1").toString());
+			
+		log.info(Chrome_Download_path)	
+			
+		String fs;
+		fs = Chrome_Download_path;
+			
+		try{
+			Files.createDirectories(Paths.get(fs));
+		}catch(Exception e){
+			log.info("Error " + e)	
+		}
+		
+		sys.defineVariable("fs", Paths.get(fs));
+		
+		
+]]></script>
+  
+  
+  <script><![CDATA[ 
+
+   		import java.util.Calendar;
+		import java.util.Formatter;
+		import java.text.SimpleDateFormat;
+		
+		
+		import java.nio.file.Files;
+		import java.nio.file.Path;
+		import java.nio.file.Paths;
+		
+		
+		String log_path = (BOT_CONFIG.getWrappedObject().get("Download_1").toString());
+			
+		log.info(log_path)	
+			
+	
+			
+		try{
+			Files.createDirectories(Paths.get(log_path));
+		}catch(Exception e){
+			log.info("Error " + e)	
+		}
+		
+		sys.defineVariable("log_path", log_path);
+		
+		
+]]></script>
+  
+  
+<!--User actions e.g open browser click etc -->
+<robotics-flow>
+<robot driver="universal" start-in-private="false" close-on-completion="true">
+<capability name ="SEARCH_ALL_WINDOWS" value="true"/>
+<capability name="CLOSE_ALL_WINDOWS" value="true"/>
+<capability name="chromeOptions">
+<script return="chromeArgs"><![CDATA[
+
+		log.info("TestChrome" + fs.toString())	
+
+		import org.openqa.selenium.chrome.ChromeOptions;
+		String dl_path = "";
+		ChromeOptions options = new ChromeOptions();
+		Map<String,Object> prefs = new HashMap<String,Object>();
+		prefs.put("download.default_directory",fs.toString())	;
+		options.setExperimentalOption("prefs",prefs)
+		chromeArgs = options;
+]]></script>
+
+</capability>
+<!--User actions e.g open browser click etc -->
+
+<script><![CDATA[
+
+		log.info ("1")
+		import org.apache.commons.httpclient.UsernamePasswordCredentials;
+		//excel
+		import java.io.File;
+		import java.io.FileInputStream;
+		import java.io.FileOutputStream;
+		import java.io.IOException;
+		import java.util.ArrayList;
+		import java.util.Collection;
+		import java.util.HashMap;
+		import java.util.List;
+		import java.util.Map;
+		import java.util.Set;
+		import java.util.TreeMap;
+		import org.apache.poi.EncryptedDocumentException;
+		import org.apache.poi.ss.usermodel.Cell;
+		import org.apache.poi.ss.usermodel.CellStyle;
+		import org.apache.poi.xssf.usermodel.XSSFRow;
+		import org.apache.poi.xssf.usermodel.XSSFSheet;
+		import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+		import java.io.BufferedWriter;
+		import java.io.File;
+		import java.io.FileOutputStream;
+		import java.io.IOException;
+		import java.io.OutputStreamWriter;
+		import java.io.Writer;
+		//time
+		import groovy.time.TimeCategory
+		//log
+		//   import org.apache.log4j.Logger
+		import org.apache.log4j.PatternLayout
+		import org.apache.log4j.RollingFileAppender
+		import com.workfusion.studio.rpa.recorder.api.*
+		import com.workfusion.studio.rpa.recorder.api.types.*
+		import com.workfusion.studio.rpa.recorder.api.custom.*
+		import com.workfusion.studio.rpa.recorder.api.internal.representation.*
+
+		import com.workfusion.bot.exception.*
+
+		import java.io.FileWriter;   // Import the FileWriter class
+		import java.io.IOException;  // Import the IOException class to handle errors
+		import java.nio.file.Files;
+		import java.nio.file.Path;
+		import java.nio.file.Paths;
+
+		import java.text.SimpleDateFormat
+
+
+		import java.text.SimpleDateFormat;
+		import java.nio.file.Path;
+		import java.nio.file.Paths;
+			
+        // pattern Layout
+        PatternLayout layout = new PatternLayout("%d{ISO8601} [%t] %-5p %c %x - %m%n")
+
+		Logger("----------------------------------------------------------------------");				
+			
+		//Read config file
+        String pathUpload_to_SFI = (BOT_CONFIG.getWrappedObject().get("Upload_to_SFI").toString()); 
+		log.info pathUpload_to_SFI
+		
+        String pathVBS_Script = (BOT_CONFIG.getWrappedObject().get("VBS_Script").toString()); 
+		log.info pathVBS_Script
+		
+		String pathUpload_to_SFI_1 = (BOT_CONFIG.getWrappedObject().get("Upload_to_SFI_1").toString()); 
+		log.info pathUpload_to_SFI_1
+		
+		String pathVBS_Script_1 = (BOT_CONFIG.getWrappedObject().get("VBS_Script_1").toString()); 
+		log.info pathVBS_Script_1
+		
+		String pathDownload_1 = (BOT_CONFIG.getWrappedObject().get("Download_1").toString()); 
+		log.info pathDownload_1
+
+		String pathDownloadWithout = (BOT_CONFIG.getWrappedObject().get("Download_without_1").toString());
+		log.info pathDownloadWithout
+		
+		String pathDownload = (BOT_CONFIG.getWrappedObject().get("Download").toString()); 
+		log.info pathDownload
+		
+		String SFIUrl = (BOT_CONFIG.getWrappedObject().get("SFIUrl").toString()); 
+		log.info SFIUrl
+		
+		String SFILoginName = (BOT_CONFIG.getWrappedObject().get("SFILoginName").toString()); 
+		
+		String SFIPass = (BOT_CONFIG.getWrappedObject().get("SFIPass").toString()); 
+
+		String SourceFilePath = (BOT_CONFIG.getWrappedObject().get("SourceFilePath").toString()); 
+		log.info SourceFilePath
+///////////////////////////////////////////
+		def date = new Date()
+		def sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss")
+		def sdfLog = new SimpleDateFormat("yyyyMMdd");
+Logger("----------------------------------------------------------------------");	
+				
+		log.info(sdf.format(date) + " " + "Start SFI: ");
+        //gAuth
+        //import com.warrenstrange.googleauth.GoogleAuthenticator;
+
+        //Kill task EXCEL
+		Runtime.getRuntime().exec("taskkill /F /IM EXCEL.exe")
+		//Kill task Chrome
+		Runtime.getRuntime().exec("taskkill /F /IM chrome.exe")
+		//clear memory
+		System.gc();
+	
+
+
+		def ListFile = RList.of()
+		def FileNumber = RNumber.fromCanonical('0')
+
+		com.workfusion.rpa.helpers.RPA.metaClass.static.$ = { Closure c -> c.call() }  // Support for Expression action. Should be implemented in RPA class in next release.
+		def i0 = com.workfusion.rpa.helpers.resources.Filter
+		    .files()
+		    .get()
+
+		ListFile = RList.of(Resource.listFolder("${SourceFilePath}", i0))
+
+
+		FileNumber = (ListFile as RList).size();
+		BooleanFile = true
+		//println FileNumber
+		if (FileNumber > 0) {
+		    BooleanFile = false
+		    log.info  "***check file***"
+		} else {
+
+		    def time_to_wait1 =  1500
+		    def time_counter1 = 0
+
+		   // println "***5***"
+		    while (BooleanFile) {
+		        sleep(1000)
+		        time_counter1 = time_counter1 + 1
+		       // println "***2***" + time_counter
+
+		ListFile = RList.of(Resource.listFolder("${SourceFilePath}", i0))
+		        FileNumber = (ListFile as RList).size();
+		        if (FileNumber > 0) {
+		            BooleanFile = false
+		            log.info  "***check filec in loop***"
+		        }
+		        if (time_counter1 > time_to_wait1) {
+		            inDesktop {
+		                log.info "***Error Too much time to run scrip 1***"
+		             Runtime.getRuntime().exec('cmd /c cscript ' + pathVBS_Script + 'VBS_3rdStep.vbs' + " " + pathVBS_Script_1);
+                   subject = "StopProcess"
+		            }
+		            break
+		        }
+		    }
+		}
+
+////////////////////////////////////////////
+
+		def acceptedFormat = "ddMMyyyyHHmm"
+		def today = new Date()
+		def currentdate = today.format(acceptedFormat) 
+		def currentdateFileFormat = pathUpload_to_SFI + 'MyFile' + currentdate + 'Data.txt'
+		log.info "currentdateFileFormat :" + currentdateFileFormat
+		def currentdateFileFormatPath = pathUpload_to_SFI_1 + 'MyFile' + currentdate + 'Data.txt'
+		log.info "currentdateFileFormatPath :" + currentdateFileFormatPath
+		subject = ""
+		
+		log.info ("2")
+		
+//////////////////////////////////////////////////////////SFI/////////////////////////////////////////////////////////////////
+		
+        inDesktop {
+            new File(pathUpload_to_SFI, 'Example.txt').withWriter('utf-8') {
+                writer -> writer.writeLine currentdate + "Test" + pathUpload_to_SFI_1 + "Test" + pathDownloadWithout + "Test" //Test was use as /n was not working on vba 
+                writer.close()
+                sleep(2000)
+            }
+            Runtime.getRuntime().exec("wscript " + pathVBS_Script + "VBS_1stStep.vbs" + " " + pathVBS_Script_1 + " " + pathDownload);
+            //Runtime.getRuntime().exec('cmd /c cscript ' + pathVBS_Script +'VBS_1stStep.vbs' + " " + pathVBS_Script_1 + " " + pathDownload);		   
+            sleep(9000);
+        }
+		
+		
+		Logger ("Run the Scrip " + pathVBS_Script + "VBS_1stStep.vbs");
+		log.info  "Run the Scrip " + pathVBS_Script + "VBS_1stStep.vbs"
+		
+        //loop to wait if file is present
+        def MyFileCompletefileName = pathUpload_to_SFI + "MyFileComplete.txt"
+		Logger ( "MyFileCompletefileName : " + MyFileCompletefileName);
+		log.info  "MyFileCompletefileName : " + MyFileCompletefileName
+        
+        def MyFileErrorfileName = pathDownload_1 + "mylogVBA.txt"
+        def MyFileComplete = new File(MyFileCompletefileName) 
+		def MyFileErrorComplete = new File(MyFileErrorfileName)
+		
+        def time_to_wait = 30 
+        def time_counter = 0
+        boolean endScript =false;
+        sleep(20000)
+        endScript = true;
+		
+		log.info ("3")
+         while (!MyFileComplete.exists()) {
+			log.info ("while")
+			
+            sleep(15000)
+            time_counter += 1
+            if (time_counter > time_to_wait) {
+                inDesktop {
+                    Logger ( "***Error Too much time to run scrip 1***");
+					log.info   "***Error Too much time to run scrip 1***"
+                    Runtime.getRuntime().exec('cmd /c cscript ' + pathVBS_Script + 'VBS_3rdStep.vbs' + " " + pathVBS_Script_1);
+                   subject = "StopProcess"
+				   sys.defineVariable("subject",subject);
+				   				   
+				   log.info ("4")
+                }
+                break              
+            }
+        }
+		
+			log.info ("5")
+		
+			def testFile = new File(currentdateFileFormat) 
+				
+			log.info ("6")
+			if (MyFileComplete.exists()) { //if exists
+			log.info ("7")
+				inChrome() {
+					//try{
+					Logger ( "Log into website " + SFIUrl);
+					log.info "Log into website " + SFIUrl
+           
+			 sleep(10000)
+			//Kill task EXCEL
+			Runtime.getRuntime().exec("taskkill /F /IM EXCEL.exe")
+			open(SFIUrl);  
+			try{
+				connectUsername = $(byXpath('//table/tbody/tr/td/input[@name = "username"]'))
+				connectUsername.sendKeys(SFILoginName);
+				connectPassword = $(byXpath('//table/tbody/tr/td/input[@name ="password"]'))
+				connectPassword.sendKeys(SFIPass);
+				connect = $(byXpath('//table/tbody/tr/td/input[@value ="Login"]'));
+				connect.click();
+			}catch (Exception) {
+				log.info ("Error login")
+				Logger ("Error login");
+			}
+					
+					sleep(1000);
+					// Switching to the 1st frame, frame index 1
+					switchTo().frame(1)
+					try {
+						setFluentWaitTimeout(10000)
+						setFluentWaitPollingInterval(300)
+						fluentWait()
+							.ignoring(org.openqa.selenium.NoSuchElementException.class)
+							.until(ExpectedConditions.presenceOfElementLocated(By.xpath(('//table/tbody/tr/td/a[@target="content"][contains(text(),"Process Centre")]'))));
+					} catch (Exception) {}
+					
+					//open('http://muubhemapp0007.corp.dsarena.com:8180/sfiwebclient/secured/mainframe.jsp');
+					ProcessCentre = $(byXpath('//table/tbody/tr/td/a[@target="content"][contains(text(),"Process Centre")]'));
+					ProcessCentre.click();
+					
+					Logger ( "***Click on Process Centre***");
+					log.info ("***Click on Process Centre***")
+
+					
+					// Switching to the parent frame, frame index content
+					switchTo().defaultContent();
+					switchTo().frame("content")
+					UploadFiles = $(byXpath('//*[@type="button"][@value="reset"]'));
+					UploadFiles.click();
+					sleep(500);
+					confirm();
+					
+					try {
+						setFluentWaitTimeout(10000)
+						setFluentWaitPollingInterval(300)
+						fluentWait()
+							.ignoring(org.openqa.selenium.NoSuchElementException.class)
+							.until(ExpectedConditions.presenceOfElementLocated(By.xpath(('//table/tbody/tr/td/input[@type="button"][@value="Upload Files"]'))));
+					}
+					 catch (Exception) {}
+					 
+					UploadFiles = $(byXpath('//table/tbody/tr/td/input[@type="button"][@value="Upload Files"]'));
+					UploadFiles.click();
+					Logger ( "***Click on Upload Files***");
+					log.info ("***Click on Upload Files***")
+					
+					AddToList = $(byXpath('//table/tbody/tr/td/input[@type="button"][@value="Add To List"]'));
+					AddToList.click();
+					
+					AddToList = $(byXpath('//table/tbody/tr/td/input[@class="itemListItem"][@id="file1"]'));
+					AddToList.click();
+					
+					Logger ( "***Click on Add To List***");
+					log.info ("***Click on Add To List***")
+				}
+				inDesktop {
+					sleep(1000);
+					//sendKeys('^n')
+					//setClipboardText(currentdateFileFormatPath)
+					//pressCtrlV();
+					sendKeys(currentdateFileFormatPath)
+					pressEnter()
+					
+					Logger ( "Upload of file " + currentdateFileFormatPath + " completed");
+					log.info ("Upload of file " + currentdateFileFormatPath + " completed")
+					
+				}
+				inChrome {
+					sleep(100);
+					upload = $(byXpath('//table/tbody/tr/td/input[@type="button"][@value="upload"]'));
+					upload.click();
+					Logger ( "***Click on Upload***");
+					log.info ("***Click on Upload***")
+					
+					sleep(1000);
+					refresh = $(byXpath('//*[@value="Refresh"]')); ////*[@id="page_border"]/table/tbody/tr/td[2]/input[1]
+					refresh.click()
+					Logger ( "***Click on Refresh***");
+					log.info ("***Click on Refresh***")
+					
+					try {
+						setFluentWaitTimeout(10000)
+						setFluentWaitPollingInterval(300)
+						fluentWait()
+							.ignoring(org.openqa.selenium.NoSuchElementException.class)
+							.until(ExpectedConditions.presenceOfElementLocated(By.xpath(('//table/tbody/tr/td/input[@type="button"][@value="Refresh"]'))));
+					} catch (Exception) {
+					}
+					
+					log.info("Test before refresh")
+					try {
+						refresh = $(byXpath('//table/tbody/tr/td/input[@type="button"][@value="Refresh"]'));
+						refresh.click();
+						sleep(500);
+					Logger ( "***Click on Refresh 2nd time***");
+					log.info ("***Click on Refresh 2nd time***")
+					try {
+						setFluentWaitTimeout(10000)
+						setFluentWaitPollingInterval(300)
+						fluentWait()
+							.ignoring(org.openqa.selenium.NoSuchElementException.class)
+							.until(ExpectedConditions.presenceOfElementLocated(By.xpath(('//table/tbody/tr/td/input[@type="button"][@value="Submit Files"]'))));
+					} catch (Exception) {
+					}
+						submit = $(byXpath('//table/tbody/tr/td/input[@type="button"][@value="Submit Files"]'));
+						submit.click();
+					Logger ( "***Click on Submit***");
+					log.info ("***Click on Submit***")
+					} catch (Exception e) {
+						try {
+							//need to click on allow if the file have same amount as another file will do it later
+							allow = $(byXpath('//*[contains(text(),"Allow")]'));
+							allow.click();
+							refresh = $(byXpath('//table/tbody/tr/td/input[@type="button"][@value="Refresh"]'));
+							refresh.click();
+							sleep(500);
+					Logger ( "***Click on Refresh After Submit***");
+					log.info ("***Click on Refresh After Submit***")
+							
+							
+					try {
+						setFluentWaitTimeout(10000)
+						setFluentWaitPollingInterval(300)
+						fluentWait()
+							.ignoring(org.openqa.selenium.NoSuchElementException.class)
+							.until(ExpectedConditions.presenceOfElementLocated(By.xpath(('//table/tbody/tr/td/input[@type="button"][@value="Submit Files"]'))));
+					} catch (Exception) {
+					}
+							submit = $(byXpath('//table/tbody/tr/td/input[@type="button"][@value="Submit Files"]'));
+							submit.click();
+					Logger ( "***Click on Submit***");
+					log.info ("***Click on Submit***")
+							// if fail need to call mail to send error 
+						} catch (Exception ee) {
+							xpathError = $(byXpath('//div[@id="divView"]/table/tbody/tr[2]/td[2]/table/tbody/tr[2]/td[5]'));
+							xpathErrortext = xpathError.getText()
+							subject = "StopProcess"
+							sys.defineVariable("subject",subject);
+							
+							Logger ( "Exception " + xpathErrortext + " ***ERROR***");
+							log.info ("Exception " + xpathErrortext + " ***ERROR***")
+							close()
+							
+							inDesktop {
+								Runtime.getRuntime().exec('cmd /c cscript ' + pathVBS_Script + 'VBS_3rdStep.vbs' + " " + pathVBS_Script_1);;
+							}
+							subject = "StopProcess"
+							sys.defineVariable("subject",subject);
+						}
+					}
+					sleep(2000);
+					refresh = $(byXpath('//*[@value="Refresh"]')); 
+					refresh.click()					
+					countXpath = 2
+					while (true) {
+						try {
+							//need to click on allow if the file have same amount as another file 
+							adv = $(byXpath('//*[@id="divView"]/table[2]/tbody/tr[2]/td[2]/table[@class="dataList"]/tbody/tr[' + countXpath + ']/td[1]/*'));
+							adv.click();
+							sleep(1000);
+							countXpath = countXpath + 1;
+						} catch (exception) {
+							break;
+						} //end catch
+					} //end while				
+				}
+				Logger ( "Going to run the Scrip " + pathVBS_Script + "VBS_2ndStep.vbs " + " " + "pathVBS_Script_1");
+				inDesktop {
+					sleep(500);
+					Runtime.getRuntime().exec('cmd /c cscript ' + pathVBS_Script + 'VBS_2ndStep.vbs' + " " + pathVBS_Script_1);
+					Logger  ("Complete the Scrip " + pathVBS_Script + "VBS_2ndStep.vbs");											
+					log.info ("Complete the Scrip " + pathVBS_Script + "VBS_2ndStep.vbs")
+				}
+				
+				def MyFileCompletefileName2 = pathUpload_to_SFI + "MyFileComplete2.txt"
+				log.info ("MyFileCompletefileName2: " + MyFileCompletefileName2)
+				Logger ( "MyFileCompletefileName2: " + MyFileCompletefileName2);
+				
+				def MyFileComplete2 = new File(MyFileCompletefileName2)
+				time_to_wait = 20
+				time_counter = 0
+				sleep(15000)
+				
+				log.info ("8")
+				while (!MyFileComplete2.exists()) {
+					log.info ("while 2")
+					sleep(2000)
+					time_counter += 1
+					if (time_counter > time_to_wait) {
+						inDesktop {
+							Logger ( "***Error Too much time to script 2***");
+							log.info ("***Error Too much time to script 2***")
+							Runtime.getRuntime().exec('cmd /c cscript ' + pathVBS_Script + 'VBS_3rdStep.vbs' + " " + pathVBS_Script_1);
+							subject = "StopProcess"
+							sys.defineVariable("subject",subject);
+							log.info ("9")
+						}
+						break
+					}
+
+				}
+				log.info ("10")
+				Logger ( "Waiting for the Scrip to complete " + pathVBS_Script + "VBS_2ndStep.vbs");
+				log.info "Waiting for the Scrip to complete " + pathVBS_Script + "VBS_2ndStep.vbs"
+				
+			} //end if statement upload txt exists
+			else {
+			log.info ("11")
+			subject = "StopProcess"
+			sys.defineVariable("subject",subject);
+				Logger ( "Automation Stop Due to some errors ");
+				log.info ("Automation Stop Due to some errors ")
+				Runtime.getRuntime().exec('cmd /c cscript ' + pathVBS_Script + 'VBS_3rdStep.vbs' + " " + pathVBS_Script_1);
+			}
+	
+		//} )
+		
+
+
+			 sleep(10000)
+			//Kill task EXCEL
+			Runtime.getRuntime().exec("taskkill /F /IM EXCEL.exe")
+			//Kill task Chrome
+			Runtime.getRuntime().exec("taskkill /F /IM chrome.exe")
+			//clear memory
+			System.gc();
+
+			log.info ("12 fin SFI")
+			log.info ("1st Step SFI complete")
+			Logger ( "1st Step SFI complete");
+			log.info subject
+			Logger ( subject);
+			sys.defineVariable("subject",subject);
+
+def Logger(String strlog){
+	try {
+		
+		def date = new Date();
+		def sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		def sdfLog = new SimpleDateFormat("yyyy-MM-dd");
+
+				
+	  FileWriter myWriter = new FileWriter(log_path.toString()+  "\\\\" + sdfLog.format(date) +"_Log_SFI.txt", true);
+	  myWriter.append("\n" );
+	  myWriter.write(sdf.format(date).toString() + " : " + strlog);
+	  myWriter.close();
+	} catch (IOException e) {
+	  System.out.println("An error occurred.");
+	  e.printStackTrace();
+	}
+}
+
+]]></script>
+
+</robot>
+</robotics-flow>
+<export include-original-data="true">
+  <single-column name="subject" value="${subject}" />
+</export>
+</config>
